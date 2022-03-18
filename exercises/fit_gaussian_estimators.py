@@ -88,7 +88,7 @@ def test_multivariate_gaussian():
     # fig3.show()
 
     # Question 6 - Maximum likelihood
-    # print(tuple([max_value_f1, max_value_f3]))
+    print(tuple([max_value_f1, max_value_f3]))
 
 
 if __name__ == '__main__':
