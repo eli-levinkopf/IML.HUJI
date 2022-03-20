@@ -26,7 +26,7 @@ def test_univariate_gaussian():
     estimatedArray = np.zeros(100)
     for i in range(1, 101):
         UniGaussian.fit(X[:i * 10])
-        estimatedArray[i-1] = UniGaussian.mu_
+        estimatedArray[i - 1] = UniGaussian.mu_
     fig1, ax1 = plt.subplots()
     ax1.plot(axis, abs(estimatedArray - mu))
     ax1.set_xlabel("number of samples")
@@ -56,14 +56,11 @@ def test_multivariate_gaussian():
                       [0.5, 0., 0., 1.]])
     numOfSamples = 1000
     X = np.random.multivariate_normal(mu, sigma, numOfSamples)
-    print((X.shape))
     MultiGaussian.fit(X)
     print(MultiGaussian.mu_)
     print(MultiGaussian.cov_)
-    # print((MultiGaussian.pdf(X)))
 
     # Question 5 - Likelihood evaluation
-    print(MultiGaussian.log_likelihood(mu, sigma, X))
     f1 = f3 = np.linspace(-10, 10, 200)
     heatmap_matrix = np.zeros((f1.shape[0], f1.shape[0]))
 
@@ -77,14 +74,21 @@ def test_multivariate_gaussian():
             heatmap_matrix[i][j] = logLikelihood
             if logLikelihood > max_value:
                 max_value_f1, max_value_f3 = f1[i], f3[j]
+                max_value = logLikelihood
 
-    fig3, ax3 = plt.subplots()
-    # sns.heatmap(heatmap_matrix)
-    ax3.imshow(heatmap_matrix, origin='lower', cmap='cubehelix',
-               aspect='auto', interpolation='nearest',
-               extent=[-10, 10, -10, 10])
-    ax3.set_xlabel("f1 values")
-    ax3.set_ylabel("f2 values")
+    # fig3, ax3 = plt.subplots()
+    # # sns.heatmap(heatmap_matrix)
+    # ax3.imshow(heatmap_matrix, origin='lower', cmap='cubehelix',
+    #            aspect='auto', interpolation='nearest',
+    #            extent=[-10, 10, -10, 10])
+    # ax3.set_xlabel("f1 values")
+    # ax3.set_ylabel("f2 values")
+    # fig3.show()
+
+    fig3 = go.Figure(go.Heatmap(x=f1, y=f3, z=heatmap_matrix),
+                     layout=go.Layout(height=500, width=500))
+    fig3.update_xaxes(title_text="f1 values")
+    fig3.update_yaxes(title_text="f3 values")
     fig3.show()
 
     # Question 6 - Maximum likelihood
