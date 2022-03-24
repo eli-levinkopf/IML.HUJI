@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from traceback import print_tb
 import numpy as np
 from numpy.linalg import inv, det, slogdet
 
@@ -56,9 +57,9 @@ class UnivariateGaussian:
         """
         self.mu_ = np.mean(X)
         if self.biased_:
-            self.var_ = 1 / len(X) * sum((X - self.mu_) ** 2)
+            self.var_ = 1 / len(X) * np.sum((X - self.mu_) ** 2)
         else:
-            self.var_ = 1 / (len(X) - 1) * sum((X - self.mu_) ** 2)
+            self.var_ = 1 / (len(X) - 1) * np.sum((X - self.mu_) ** 2)
         self.fitted_ = True
         return self
 
@@ -84,8 +85,8 @@ class UnivariateGaussian:
             raise ValueError(
                 "Estimator must first be fitted before calling `pdf` function")
 
-        return np.exp(-(X - self.mu_) ** 2 / 2 * self.var_ ** 2) / (
-                self.var_ * math.sqrt(2 * math.pi))
+        return np.exp(-(X - self.mu_) ** 2 / (2 * self.var_)) / (
+                 np.sqrt(2 * np.pi * self.var_))
 
     @staticmethod
     def log_likelihood(mu: float, sigma: float, X: np.ndarray) -> float:
@@ -106,9 +107,8 @@ class UnivariateGaussian:
         log_likelihood: float
             log-likelihood calculated
         """
-        denom = (X.size / 2) * (2 * np.log(sigma) + np.log(2 * math.pi))
-        num = - sum((X - mu) ** 2) / (2 * sigma ** 2)
-        return num / denom
+        return - (X.shape[0] / 2) * np.log(2 * np.pi) + (np.log(sigma)) \
+             - 1/(2*sigma) * np.sum((X - mu) ** 2)
 
 
 class MultivariateGaussian:
@@ -182,13 +182,10 @@ class MultivariateGaussian:
             raise ValueError(
                 "Estimator must first be fitted before calling `pdf` function")
 
-        # print("pdf with multivariate_normal: ", multivariate_normal.pdf(X, self.mu_, self.cov_))
-
         k = self.mu_.shape[0]
+        inv_cov = inv(self.cov_)
         denom = ((2 * np.pi) ** k * det(self.cov_)) ** 0.5
-        num = np.exp(
-            -1 / 2 * (X - self.mu_) @ inv(self.cov_) @ (X - self.mu_).T)
-        return num / denom
+        return [np.exp(-1 / 2 * (row - self.mu_) @ inv_cov @ (row - self.mu_).T) for row in X]/denom
 
     @staticmethod
     def log_likelihood(mu: np.ndarray, cov: np.ndarray,
@@ -210,10 +207,8 @@ class MultivariateGaussian:
         log_likelihood: float
             log-likelihood calculated over all input data and under given parameters of Gaussian
         """
-        # print("multivariate_normal.logpdf: ",
-        #       sum(multivariate_normal.logpdf(X, mean=mu, cov=cov)))
-
-        n = X.shape[0]
-        k = mu.shape[0]
-        return -n * k / 2 * np.log(2 * np.pi) - n / 2 * np.log(
-            det(cov)) - 1 / 2 * np.sum((X - mu) @ inv(cov) @ (X - mu).T)
+        n, k = X.shape[0], mu.shape[0]
+        inv_cov = inv(cov)
+        return -n * k / 2 * np.log(2 * np.pi) - n / 2 * np.log(det(cov)) \
+            - 1 / 2 * np.sum([(row - mu) @ inv_cov @ (row - mu).T for row in X])
+        
