@@ -1,6 +1,3 @@
-# TODO: delete 2 lines before submit
-import sys
-sys.path.append('/Users/elilevinkopf/Documents/Ex22B/IML/IML.HUJI')
 from IMLearn.learners import UnivariateGaussian, MultivariateGaussian
 import numpy as np
 import plotly.graph_objects as go
@@ -23,10 +20,6 @@ def test_univariate_gaussian():
     X = np.random.normal(mu, var, numOfSamples)
     UniGaussian.fit(X)
     print(f"(expectation, variance) = ({UniGaussian.mu_}, {UniGaussian.var_})")
-    
-    # TODO: delete this test before submit
-    # print(np.sum(scipy.stats.norm.logpdf(X, mu, var)))
-    # print(UniGaussian.log_likelihood(mu, var, X))
 
 
     # Question 2 - Empirically showing sample mean is consistent
@@ -69,16 +62,6 @@ def test_multivariate_gaussian():
     MultiGaussian.fit(X)
     print(f" estimated expectation:\n{MultiGaussian.mu_}")
     print(f"covariance matrix:\n{MultiGaussian.cov_}")
-
-    # TODO: delete this test before submit
-    # from scipy.stats import multivariate_normal
-    # print(f"my_likelihood: {MultiGaussian.log_likelihood(mu, cov, X)}")
-    # print(f"multivariate_normal: {np.sum(multivariate_normal.logpdf(X, mu, cov))}")
-    # my_pdf = MultiGaussian.pdf(X)
-    # scipy_pdf = multivariate_normal.pdf(X, mu, cov)
-    # print(f"my_pdf: {np.sum(my_pdf)}")
-    # print(f"scipy: {np.sum(scipy_pdf)}")
-
 
 
     # Question 5 - Likelihood evaluation
