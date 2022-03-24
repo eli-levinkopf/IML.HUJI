@@ -1,3 +1,4 @@
+# TODO: delete 2 lines before submit
 import sys
 sys.path.append('/Users/elilevinkopf/Documents/Ex22B/IML/IML.HUJI')
 from IMLearn.learners import UnivariateGaussian, MultivariateGaussian
@@ -6,9 +7,9 @@ import plotly.graph_objects as go
 import plotly.io as pio
 import matplotlib.pyplot as plt
 from plotly.subplots import make_subplots
-from scipy.stats import multivariate_normal
 
-# import scipy.stats
+
+
 
 pio.templates.default = "simple_white"
 
@@ -21,9 +22,11 @@ def test_univariate_gaussian():
     numOfSamples = 1000
     X = np.random.normal(mu, var, numOfSamples)
     UniGaussian.fit(X)
+    print(f"(expectation, variance) = ({UniGaussian.mu_}, {UniGaussian.var_})")
+    
+    # TODO: delete this test before submit
     # print(np.sum(scipy.stats.norm.logpdf(X, mu, var)))
     # print(UniGaussian.log_likelihood(mu, var, X))
-    print(f"(expectation, variance) = ({UniGaussian.mu_}, {UniGaussian.var_})")
 
 
     # Question 2 - Empirically showing sample mean is consistent
@@ -67,6 +70,8 @@ def test_multivariate_gaussian():
     print(f" estimated expectation:\n{MultiGaussian.mu_}")
     print(f"covariance matrix:\n{MultiGaussian.cov_}")
 
+    # TODO: delete this test before submit
+    # from scipy.stats import multivariate_normal
     # print(f"my_likelihood: {MultiGaussian.log_likelihood(mu, cov, X)}")
     # print(f"multivariate_normal: {np.sum(multivariate_normal.logpdf(X, mu, cov))}")
     # my_pdf = MultiGaussian.pdf(X)
@@ -104,23 +109,9 @@ def test_multivariate_gaussian():
     print(f"(f1, f3) that achieved the maximum log-likelihood: ({round(max_value_f1, 3)}, {round(max_value_f3, 3)})")
 
 
-def lab(): 
-    samples = np.array([1, 5, 2, 3, 8, -4, -2, 5, 1, 10, -10, 4, 5, 2, 7, 1, 1, 3, 2, -1, -3, 1, -4, 1, 2, 1,
-                        -4, -4, 1, 3, 2, 6, -6, 8, 3, -6, 4, 1, -2, 3, 1, 4, 1, 4, -2, 3, -1, 0, 3, 5, 0, -2])
-
-    univariate = UnivariateGaussian()
-    univariate.fit(samples)
-    print(f"mu=1, sigma=1: {round(univariate.log_likelihood(1, 1, samples), 2)}")
-    print(f"mu=10, sigma=1; {round(univariate.log_likelihood(10, 1, samples), 2)}")
 
 
-import time
 if __name__ == '__main__':
-    start = time.time()
-    np.random.seed(0)
     test_univariate_gaussian()
     test_multivariate_gaussian()
-    end = time.time()
-    print(end - start)
-    # lab()
 
