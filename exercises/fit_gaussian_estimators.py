@@ -109,8 +109,6 @@ def test_multivariate_gaussian():
     print(f"(f1, f3) that achieved the maximum log-likelihood: ({round(max_value_f1, 3)}, {round(max_value_f3, 3)})")
 
 
-
-
 if __name__ == '__main__':
     test_univariate_gaussian()
     test_multivariate_gaussian()
