@@ -211,4 +211,3 @@ class MultivariateGaussian:
         inv_cov = inv(cov)
         return -n * k / 2 * np.log(2 * np.pi) - n / 2 * np.log(det(cov)) \
             - 1 / 2 * np.sum([(row - mu) @ inv_cov @ (row - mu).T for row in X])
-        
