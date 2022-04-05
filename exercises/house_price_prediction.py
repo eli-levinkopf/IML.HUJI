@@ -1,5 +1,5 @@
+# TODO: Remove before submission
 import sys
-from turtle import st
 sys.path.append('/Users/elilevinkopf/Documents/Ex22B/IML/IML.HUJI')
 
 from sklearn.metrics import average_precision_score
@@ -104,6 +104,7 @@ if __name__ == '__main__':
     # Question 3 - Split samples into training - and testing sets.
     train_X, train_Y, test_X, test_Y = split_train_test(design_matrix, response_vector, .75)
 
+
     # Question 4 - Fit model over increasing percentages of the overall training data
     # For every percentage p in 10%, 11%, ..., 100%, repeat the following 10 times:
     #   1) Sample p% of the overall training data
@@ -112,7 +113,7 @@ if __name__ == '__main__':
     #   4) Store average and variance of loss over test set
     # Then plot average loss as function of training size with error ribbon of size (mean-2*std, mean+2*std)
 
-    linear_regression = LinearRegression(include_intercept=False)
+    linear_regression = LinearRegression(include_intercept=True)
     range = np.arange(10, 101)
     res = np.empty(shape=(0,0))
     std = np.empty(shape=(0,0))
@@ -126,7 +127,8 @@ if __name__ == '__main__':
         res = np.append(res, np.mean(mse_array))
         std = np.append(std, np.std(mse_array))
 
-    fig = go.Figure(layout=go.Layout(title_text='mean loss as a function of percentage of training set',xaxis={"title": 'percentage'}, yaxis={"title": 'MSE of test set'}))
+    fig = go.Figure(layout=go.Layout(title_text='mean loss as a function of percentage of training set'
+                                    ,xaxis={"title": 'percentage'}, yaxis={"title": 'MSE of test set'}))
     fig.add_traces(go.Scatter(x=range,y=res, mode="markers+lines", name='Mean Of MSE', marker=dict(color="blue", opacity=.7)))
     fig.add_traces(go.Scatter(x=range, y=res - 2*std, fill=None, mode='lines', line=dict(color="lightgrey"), showlegend=False))
     fig.add_traces(go.Scatter(x=range, y=res + 2*std, fill='tonexty', mode='lines', line=dict(color="lightgrey"), showlegend=False))
