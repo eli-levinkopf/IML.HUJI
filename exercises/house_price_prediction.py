@@ -60,7 +60,7 @@ def load_data(filename: str):
     df = pd.get_dummies(df, prefix='yr_built', columns=['yr_built']).astype(int)
     df = pd.get_dummies(df, prefix='zipcode', columns=['zipcode']).astype(int)
 
-    df.to_csv('datasets/preprocess_data.csv')
+    # df.to_csv('datasets/preprocess_data.csv')
     return df
 
 

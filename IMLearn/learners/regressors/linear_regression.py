@@ -74,7 +74,7 @@ class LinearRegression(BaseEstimator):
             X = np.concatenate([ones, X], axis=1)
         return X @ self.coefs_
 
-    def _loss(self, X: np.ndarray, y: np.ndarray) -> float:
+    def _loss(self, X: np.ndartray, y: np.ndarray) -> float:
         """
         Evaluate performance under MSE loss function
 
