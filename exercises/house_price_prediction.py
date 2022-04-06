@@ -1,7 +1,3 @@
-# TODO: Remove before submission
-import sys
-sys.path.append('/Users/elilevinkopf/Documents/Ex22B/IML/IML.HUJI')
-
 from sklearn.metrics import average_precision_score
 import plotly.io as pio
 import plotly.express as px
@@ -60,7 +56,6 @@ def load_data(filename: str):
     df = pd.get_dummies(df, prefix='yr_built', columns=['yr_built']).astype(int)
     df = pd.get_dummies(df, prefix='zipcode', columns=['zipcode']).astype(int)
 
-    # df.to_csv('datasets/preprocess_data.csv')
     return df
 
 
@@ -95,7 +90,6 @@ if __name__ == '__main__':
     np.random.seed(0)
     # Question 1 - Load and preprocessing of housing prices dataset
     df = load_data('datasets/house_prices.csv')
-    # print(df)
 
     # Question 2 - Feature evaluation with respect to response
     design_matrix, response_vector = df.drop('price', axis=1), df['price']
@@ -132,4 +126,5 @@ if __name__ == '__main__':
     fig.add_traces(go.Scatter(x=range,y=res, mode="markers+lines", name='Mean Of MSE', marker=dict(color="blue", opacity=.7)))
     fig.add_traces(go.Scatter(x=range, y=res - 2*std, fill=None, mode='lines', line=dict(color="lightgrey"), showlegend=False))
     fig.add_traces(go.Scatter(x=range, y=res + 2*std, fill='tonexty', mode='lines', line=dict(color="lightgrey"), showlegend=False))
-    fig.write_image('/Users/elilevinkopf/Documents/Ex22B/IML/ex2/plots/mse.png')
+    # fig.write_image('/Users/elilevinkopf/Documents/Ex22B/IML/ex2/plots/mse.png')
+    fig.write_image('mse.png')

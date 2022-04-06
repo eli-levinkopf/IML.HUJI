@@ -1,6 +1,3 @@
-# TODO: Remove before submission
-import sys
-sys.path.append('/Users/elilevinkopf/Documents/Ex22B/IML/IML.HUJI')
 import IMLearn.learners.regressors.linear_regression
 from IMLearn.learners.regressors import PolynomialFitting
 from IMLearn.utils import split_train_test
@@ -48,19 +45,22 @@ if __name__ == '__main__':
     for year in set(data_from_isreal['Year']):
         fig1.add_traces(go.Scatter(x=dayofyear ,y=data_from_isreal[data_from_isreal['Year'] == year]['Temp'],
                                    type='scatter', mode='markers', name=f'{year}'))
-    fig1.write_image('/Users/elilevinkopf/Documents/Ex22B/IML/ex2/plots/TempInIsreal.png')
+    # fig1.write_image('/Users/elilevinkopf/Documents/Ex22B/IML/ex2/plots/TempInIsreal.png')
+    fig1.write_image('TempInIsreal.png')
 
     dataframe = data_from_isreal.groupby('Month').agg('std')
     fig2 = px.bar(dataframe, x=list(month_name)[1:], y='Temp', title='std of temperature in Israel per month')
     fig2.update_yaxes(title_text='std of Temperature')
-    fig2.write_image('/Users/elilevinkopf/Documents/Ex22B/IML/ex2/plots/TempPerMonthInIsreal.png')
+    # fig2.write_image('/Users/elilevinkopf/Documents/Ex22B/IML/ex2/plots/TempPerMonthInIsreal.png')
+    fig2.write_image('TempPerMonthInIsreal.png')
 
     # Question 3 - Exploring differences between countries
     data_group_by_country = df.groupby(['Country', 'Month'], as_index=False).agg({'Temp':['mean', 'std']})
     fig3 = px.line(x=data_group_by_country['Month'], y=data_group_by_country[('Temp', 'mean')], 
                    color=data_group_by_country['Country'], labels={'x':'Month', 'y':'Mean Temperature', 'color':'Country'},
                    error_y=data_group_by_country[('Temp', 'std')], title='Mean Temperature per Month')
-    fig3.write_image('/Users/elilevinkopf/Documents/Ex22B/IML/ex2/plots/MeanTemperaturePerMonth.png')
+    # fig3.write_image('/Users/elilevinkopf/Documents/Ex22B/IML/ex2/plots/MeanTemperaturePerMonth.png')
+    fig3.write_image('MeanTemperaturePerMonth.png')
 
 
     # Question 4 - Fitting model for different values of `k`
@@ -84,7 +84,8 @@ if __name__ == '__main__':
     print(f'test_error: {test_error}')
     fig4 = px.bar(x=np.arange(1, 11), y=test_error, pattern_shape=np.arange(1, 11), title='Test error as a function of k',
                   labels={'x':'k', 'y':'test error'})
-    fig4.write_image('/Users/elilevinkopf/Documents/Ex22B/IML/ex2/plots/TestError.png')        
+    # fig4.write_image('/Users/elilevinkopf/Documents/Ex22B/IML/ex2/plots/TestError.png')        
+    fig4.write_image('TestError.png')        
 
 
     # Question 5 - Evaluating fitted model on different countries
@@ -98,7 +99,8 @@ if __name__ == '__main__':
     
     fig5 = px.bar(x=countries.keys() ,y=errors, title='Israel model error over each of the other countries', 
                   labels={'x':'Country', 'y':'Israel model error'})
-    fig5.write_image('/Users/elilevinkopf/Documents/Ex22B/IML/ex2/plots/TestErrorVSIsraelModel.png')
+    # fig5.write_image('/Users/elilevinkopf/Documents/Ex22B/IML/ex2/plots/TestErrorVSIsraelModel.png')
+    fig5.write_image('TestErrorVSIsraelModel.png')
     
 
     
