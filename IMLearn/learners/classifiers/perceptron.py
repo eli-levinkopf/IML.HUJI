@@ -3,6 +3,7 @@ from typing import Callable
 from typing import NoReturn
 from ...base import BaseEstimator
 import numpy as np
+from IMLearn.metrics.loss_functions import misclassification_error
 
 
 def default_callback(fit: Perceptron, x: np.ndarray, y: int):
@@ -72,6 +73,8 @@ class Perceptron(BaseEstimator):
         self.max_iter_ = max_iter
         self.callback_ = callback
         self.coefs_ = None
+        self.training_loss_ = []
+        self.missed = False
 
     def _fit(self, X: np.ndarray, y: np.ndarray) -> NoReturn:
         """
@@ -90,7 +93,26 @@ class Perceptron(BaseEstimator):
         -----
         Fits model with or without an intercept depending on value of `self.fit_intercept_`
         """
-        raise NotImplementedError()
+        tmp_X = X
+        n = X.shape[0]
+        if self.include_intercept_:
+            X = self.__include_intercept(X)
+        self.coefs_ = np.zeros(X.shape[1])
+        num_of_iter = 0
+        while num_of_iter < self.max_iter_:
+            self.missed = False
+            for i in range(X.shape[0]):
+                if y[i]*(self.coefs_ @ X[i].T) <= 0:
+                    self.coefs_ += y[i]*X[i]
+                    self.missed = True
+                    self.fitted_ = True
+                    break
+            self.callback_(self,tmp_X, y)
+            num_of_iter += 1
+            if not self.missed:
+                return
+
+
 
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """
@@ -106,7 +128,9 @@ class Perceptron(BaseEstimator):
         responses : ndarray of shape (n_samples, )
             Predicted responses of given samples
         """
-        raise NotImplementedError()
+        if self.include_intercept_:
+            X = self.__include_intercept(X)
+        return np.sign(X @ self.coefs_)
 
     def _loss(self, X: np.ndarray, y: np.ndarray) -> float:
         """
@@ -125,4 +149,8 @@ class Perceptron(BaseEstimator):
         loss : float
             Performance under missclassification loss function
         """
-        raise NotImplementedError()
+        y_pred = self._predict(X)
+        return misclassification_error(y, y_pred)
+
+    def __include_intercept(self, X: np.ndarray) -> None:
+        return np.insert(X, 0, 1, axis=1)

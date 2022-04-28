@@ -1,6 +1,7 @@
 from typing import NoReturn
 from ...base import BaseEstimator
 import numpy as np
+from IMLearn.metrics import misclassification_error
 
 class GaussianNaiveBayes(BaseEstimator):
     """
@@ -39,7 +40,12 @@ class GaussianNaiveBayes(BaseEstimator):
         y : ndarray of shape (n_samples, )
             Responses of input data to fit to
         """
-        raise NotImplementedError()
+        self.fitted_ = True
+        self.classes_ = np.unique(y)
+        self.n_classes_ = np.max(y) + 1
+        self.mu_ = np.array([X[np.where(y == i)].mean(axis=0) for i in range(self.n_classes_)])
+        self.vars_ = np.array([X[np.where(y == i)].var(axis=0, ddof=1) for i in range(self.n_classes_)])
+        self.pi_ = np.bincount(y) / len(y)
 
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """
@@ -55,7 +61,7 @@ class GaussianNaiveBayes(BaseEstimator):
         responses : ndarray of shape (n_samples, )
             Predicted responses of given samples
         """
-        raise NotImplementedError()
+        return self.likelihood(X).argmax(axis=1)
 
     def likelihood(self, X: np.ndarray) -> np.ndarray:
         """
@@ -75,7 +81,16 @@ class GaussianNaiveBayes(BaseEstimator):
         if not self.fitted_:
             raise ValueError("Estimator must first be fitted before calling `likelihood` function")
 
-        raise NotImplementedError()
+        likelihood = []
+        for i in range(len(X)):
+            p = []
+            for j in range(self.n_classes_):
+                p.append((1/np.sqrt(2*np.pi * self.vars_[j]) * 
+                np.exp(-0.5 * np.power((X[i] - self.mu_[j]), 2)/self.vars_[j])).prod()*self.pi_[j])
+            p = np.array(p)
+            likelihood.append(p/np.sum(p))
+        return np.array(likelihood)
+        
 
     def _loss(self, X: np.ndarray, y: np.ndarray) -> float:
         """
@@ -94,4 +109,5 @@ class GaussianNaiveBayes(BaseEstimator):
         loss : float
             Performance under missclassification loss function
         """
-        raise NotImplementedError()
+        return misclassification_error(self.predict(X), y)
+

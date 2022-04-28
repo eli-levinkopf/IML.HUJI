@@ -2,6 +2,7 @@ from typing import NoReturn
 from ...base import BaseEstimator
 import numpy as np
 from numpy.linalg import det, inv
+from IMLearn.metrics import misclassification_error
 
 
 class LDA(BaseEstimator):
@@ -31,6 +32,7 @@ class LDA(BaseEstimator):
         """
         super().__init__()
         self.classes_, self.mu_, self.cov_, self._cov_inv, self.pi_ = None, None, None, None, None
+        self.fitted_ = False
 
     def _fit(self, X: np.ndarray, y: np.ndarray) -> NoReturn:
         """
@@ -46,7 +48,19 @@ class LDA(BaseEstimator):
         y : ndarray of shape (n_samples, )
             Responses of input data to fit to
         """
-        raise NotImplementedError()
+        self.fitted_ = True
+        self.classes_ = np.unique(y)
+        
+        # self.mu_ = np.array([X[y==1].mean(axis=0), X[y==-1].mean(axis=0)]).T
+        self.mu_ = np.array([X[y == t].mean(axis=0) for t in self.classes_]).T # TODO: remove for
+        self.cov_ = ((X[y==1]-self.mu_[:,0]).T @ (X[y==1]-self.mu_[:,0]) + 
+                     (X[y==-1]-self.mu_[:,1]).T @ (X[y==-1]-self.mu_[:,1])) 
+        self.cov_ /= y.size
+        self._cov_inv =  np.linalg.inv(self.cov_)
+        # self.pi_ = np.array([(y == 1).mean(axis=0), X[y==-1].mean(axis=0)]) 
+        self.pi_ = np.array([(y == t).mean() for t in self.classes_]) # TODO: remove for
+        self.bias_ = - 0.5 * np.diag(self.mu_.T @ self._cov_inv @ self.mu_) + np.log(self.pi_)
+
 
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """
@@ -62,7 +76,7 @@ class LDA(BaseEstimator):
         responses : ndarray of shape (n_samples, )
             Predicted responses of given samples
         """
-        raise NotImplementedError()
+        return self.classes_[np.argmax(self.likelihood(X), axis=1)]
 
     def likelihood(self, X: np.ndarray) -> np.ndarray:
         """
@@ -81,8 +95,7 @@ class LDA(BaseEstimator):
         """
         if not self.fitted_:
             raise ValueError("Estimator must first be fitted before calling `likelihood` function")
-
-        raise NotImplementedError()
+        return X @ self._cov_inv @ self.mu_ + self.bias_
 
     def _loss(self, X: np.ndarray, y: np.ndarray) -> float:
         """
@@ -101,4 +114,4 @@ class LDA(BaseEstimator):
         loss : float
             Performance under missclassification loss function
         """
-        raise NotImplementedError()
+        return misclassification_error(self.predict(X), y)
