@@ -1,3 +1,6 @@
+
+import sys
+sys.path.append('/Users/elilevinkopf/Documents/Ex22B/IML/IML.HUJI')
 from sklearn.metrics import average_precision_score
 import plotly.io as pio
 import plotly.express as px
