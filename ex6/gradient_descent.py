@@ -1,9 +1,7 @@
-
-
 from __future__ import annotations
 from typing import Callable, NoReturn
 import numpy as np
-from numpy.linalg import norm
+
 from IMLearn.base import BaseModule, BaseLR
 from .learning_rate import FixedLR
 
@@ -17,20 +15,25 @@ def default_callback(**kwargs) -> NoReturn:
 class GradientDescent:
     """
     Gradient Descent algorithm
+
     Attributes:
     -----------
     learning_rate_: BaseLR
         Learning rate strategy for retrieving the learning rate at each iteration t of the algorithm
+
     tol_: float
         The stopping criterion. Training stops when the Euclidean norm of w^(t)-w^(t-1) is less than
         specified tolerance
+
     max_iter_: int
         The maximum number of GD iterations to be performed before stopping training
+
     out_type_: str
         Type of returned solution:
             - `last`: returns the point reached at the last GD iteration
             - `best`: returns the point achieving the lowest objective
             - `average`: returns the average point over the GD iterations
+
     callback_: Callable[[...], None], default=default_callback
         A callable function to be called after each update of the model while fitting to given data.
         Callable function receives as input any argument relevant for the current GD iteration. Arguments
@@ -44,17 +47,22 @@ class GradientDescent:
                  callback: Callable[[GradientDescent], None] = default_callback):
         """
         Instantiate a new instance of the GradientDescent class
+
         Parameters
         ----------
         learning_rate: BaseLR, default=FixedLR(1e-3)
             Learning rate strategy for retrieving the learning rate at each iteration t of the algorithm
+
         tol: float, default=1e-5
             The stopping criterion. Training stops when the Euclidean norm of w^(t)-w^(t-1) is less than
             specified tolerance
+
         max_iter: int, default=1000
             The maximum number of GD iterations to be performed before stopping training
+
         out_type: str, default="last"
             Type of returned solution. Supported types are specified in class attributes
+
         callback: Callable[[...], None], default=default_callback
             A callable function to be called after each update of the model while fitting to given data.
             Callable function receives as input any argument relevant for the current GD iteration. Arguments
@@ -111,28 +119,33 @@ class GradientDescent:
                 Euclidean norm of w^(t)-w^(t-1)
 
         """
-        if f.weights is None: f.weights(np.random.rand(X.shape[1]))
-        w = f.weights
-        sum = np.zeros(f.weights.shape[0])
-        value = f.compute_output(X=X, y=y)
+        if f.weights is None:
+            f.weights(np.random.rand(X.shape[1]))
+        sum_weights = np.zeros(f.weights.shape[0])
+        best_w = f.weights
+        best_f_val = f.compute_output(X=X, y=y)
+        T = 0
 
-        total = 0
-        for i in range(self.max_iter_):
-            eta = self.learning_rate_.lr_step(t=i)
-            sum += f.weights
-            tmp_w = f.weights
-            tmp_value = f.compute_output(X=X, y=y)
-            f.weights = tmp_w - eta * f.compute_jacobian(X=X, y=y)
+        for t in range(self.max_iter_):
+            sum_weights += f.weights
+            last_w = f.weights
+            eta = self.learning_rate_.lr_step(t=t)
+            f.weights = last_w - eta * f.compute_jacobian(X=X, y=y)
+            val = f.compute_output(X=X, y=y)
+            if val < best_f_val:
+                best_f_val = val
+                best_w = f.weights
+            delta = np.linalg.norm(f.weights - last_w)
+            self.callback_(solver=self, weights=f.weights, val=val, grad=f.compute_jacobian(X=X, y=y), t=t, eta=eta,
+                           delta=delta)
+            T += 1
+            if delta < self.tol_:
+                break
 
-            if tmp_value < value:
-                w = f.weights
-                value = tmp_value
+        if self.out_type_ == "last":
+            return f.weights
+        if self.out_type_ == "best":
+            return best_w
+        if self.out_type_ == "average":
+            return sum_weights / T
 
-            delta = norm(f.weights - tmp_w)
-            self.callback_(self, f.weights, value, f.compute_jacobian(X=X, y=y), i, eta, delta)
-            total += 1
-            if self.tol_ > delta: break
-
-        if self.out_type_ == "best": return w
-        if self.out_type_ == "last": return f.weights
-        if self.out_type_ == "average": return sum / total
